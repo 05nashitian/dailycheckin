@@ -1,8 +1,8 @@
 name: 📅 每日贴吧签到
 
 on:
-  # 北京时间每日08:00触发 → UTC 0 点
   schedule:
+    # 北京时间 08:00 → UTC 0 点
     - cron: '0 0 * * *'
   workflow_dispatch:
 
@@ -10,21 +10,20 @@ jobs:
   tieba-checkin:
     runs-on: ubuntu-latest
     steps:
-      # 1. 签出代码
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
 
-      # 2. 安装 Python
-      - uses: actions/setup-python@v4
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
           python-version: '3.x'
 
-      # 3. 安装 dailycheckin
       - name: Install dailycheckin
         run: |
           pip install --upgrade pip
           pip install dailycheckin
 
-      # 4. （可选）打印 Secrets 验证加载正常
+      # 可选：调试 Secrets
       - name: Debug env
         env:
           TIEBA_BDUSS:        ${{ secrets.TIEBA_BDUSS }}
@@ -35,11 +34,10 @@ jobs:
           echo "BOT=[$TELEGRAM_BOT_TOKEN]"
           echo "CHAT=[$TELEGRAM_CHAT_ID]"
 
-      # 5. （可选）确认 config.yml 已拉取
-      - name: Show config.yml
-        run: cat ./config.yml
+      # 可选：显示 JSON 配置
+      - name: Show config.json
+        run: cat ./config.json
 
-      # 6. 真正调用 dailycheckin（去掉 --verbose）
       - name: Run Tieba Sign-in
         env:
           TIEBA_BDUSS:        ${{ secrets.TIEBA_BDUSS }}
