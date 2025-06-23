@@ -2,26 +2,33 @@ name: 📅 每日贴吧签到
 
 on:
   schedule:
-    - cron: '0 0 * * *'    # UTC0 → 北京时间08:00
-  workflow_dispatch:
+    # UTC 0 点触发 = 北京时间 08:00
+    - cron: '0 0 * * *'
+  workflow_dispatch:     # 支持手动触发
 
 jobs:
   tieba-checkin:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
 
+    steps:
+      # 1. 签出仓库
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      # 2. 准备 Python
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.x'
 
+      # 3. 安装 dailycheckin
       - name: Install dailycheckin
         run: |
           pip install --upgrade pip
           pip install dailycheckin
 
-      - name: 【调试】显示环境变量
+      # 4. （可选）调试：确认 Secrets 已加载
+      - name: Debug env
         env:
           TIEBA_BDUSS:        ${{ secrets.TIEBA_BDUSS }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
@@ -31,12 +38,14 @@ jobs:
           echo "BOT=[$TELEGRAM_BOT_TOKEN]"
           echo "CHAT=[$TELEGRAM_CHAT_ID]"
 
-      - name: 【调试】显示配置文件
-        run: cat ./config.json
+      # 5. （可选）调试：打印 config.yml 内容
+      - name: Show config.yml
+        run: cat ./config.yml
 
-      - name: Run Tieba Sign-in (verbose)
+      # 6. 运行签到（只启动 tieba 服务并发送 Telegram）
+      - name: Run Tieba Sign-in
         env:
           TIEBA_BDUSS:        ${{ secrets.TIEBA_BDUSS }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID:   ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: dailycheckin --include tieba --verbose
+        run: dailycheckin --include tieba
