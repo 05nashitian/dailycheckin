@@ -32,7 +32,7 @@ jobs:
           echo "CHAT=[$TELEGRAM_CHAT_ID]"
 
       - name: 【调试】显示配置文件
-        run: cat ./config.yml
+        run: cat ./config.json
 
       - name: Run Tieba Sign-in (verbose)
         env:
