@@ -2,8 +2,7 @@ name: 📅 每日贴吧签到
 
 on:
   schedule:
-    # UTC0 触发 → 北京时间08:00
-    - cron: '0 0 * * *'
+    - cron: '0 0 * * *'    # UTC0 → 北京时间08:00
   workflow_dispatch:
 
 jobs:
@@ -22,11 +21,22 @@ jobs:
           pip install --upgrade pip
           pip install dailycheckin
 
-      - name: Run Tieba Sign-in
+      - name: 【调试】显示环境变量
         env:
           TIEBA_BDUSS:        ${{ secrets.TIEBA_BDUSS }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID:   ${{ secrets.TELEGRAM_CHAT_ID }}
-        # 把 -c 去掉，改成下面任意一种：
-        run: dailycheckin --include tieba
-        # 或者： run: dailycheckin
+        run: |
+          echo "BDUSS=[$TIEBA_BDUSS]"
+          echo "BOT=[$TELEGRAM_BOT_TOKEN]"
+          echo "CHAT=[$TELEGRAM_CHAT_ID]"
+
+      - name: 【调试】显示配置文件
+        run: cat ./config.yml
+
+      - name: Run Tieba Sign-in (verbose)
+        env:
+          TIEBA_BDUSS:        ${{ secrets.TIEBA_BDUSS }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID:   ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: dailycheckin --include tieba --verbose
